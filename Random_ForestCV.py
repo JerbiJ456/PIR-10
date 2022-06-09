@@ -149,7 +149,7 @@ for i in range(4):
         bestRF = [forest, testPrecision]
         print("\nNEW BEST FOREST")"""
     
-    # SAVING FORESTS FOR DETECTION STEP      (Je save les 4 et dans le code finalRF3D.py je donne le droit de choisir quel fichier prendre)
+    # SAVING FORESTS FOR NEXT STEP      (Je save les 4 et dans le code finalRF3D.py je donne le droit de choisir quel fichier prendre)
 
     print("Saving the best RF in the folder \"cvClassifiers\"")
     filename = cwd+f"\\cvClassifiers\\rfFold{i+1}.joblib" if "\\" in cwd else cwd+f"/cvClassifiers/rfFold{i+1}.joblib"
@@ -162,8 +162,8 @@ with open(filename, 'w') as f:
     print("\nTraining Precision, Testing Accuracy")
     for i,j in zip(trainingPrecisions, testingPrecisions):
         print("           ",i,", ",j)
-        f.write("           ",i,", ",j)
+        f.write(f"           {i} , {j}")
     print("           ",sum(trainingPrecisions)/4,", ",sum(testingPrecisions)/4)
-    f.write("           ",sum(trainingPrecisions)/4,", ",sum(testingPrecisions)/4)
+    f.write(f"            {sum(trainingPrecisions)/4}, {sum(testingPrecisions)/4}")
 end = int(time() - startTotal)
 print(f"\nDone in {end//60}m{end%60}s")
