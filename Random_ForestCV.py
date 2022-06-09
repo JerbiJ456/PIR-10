@@ -147,7 +147,7 @@ for i in range(4):
         bestRF = [forest, testPrecision]
         print("\nNEW BEST FOREST")"""
     
-    # SAVING FORESTS FOR NEXT STEP      (Je save les 4 et dans le code finalRF3D.py je donne le droit de choisir quel fichier prendre)
+    # SAVING FORESTS FOR DETECTION STEP      (Je save les 4 et dans le code finalRF3D.py je donne le droit de choisir quel fichier prendre)
 
     print("Saving the best RF in the folder \"cvClassifiers\"")
     filename = cwd+f"\\cvClassifiers\\rfFold{i+1}.joblib" if "\\" in cwd else cwd+f"/cvClassifiers/rfFold{i+1}.joblib"
@@ -155,7 +155,7 @@ for i in range(4):
 
 filename = cwd+f"\\Results\\precisionsCV{rand}.txt" if "\\" in cwd else cwd+f"/Results/precisionsCV{rand}.txt"
 
-with open('docs/readme.txt', 'w') as f:
+with open(filename, 'w') as f:
     f.write("Training Precision, Testing Accuracy")
     print("\nTraining Precision, Testing Accuracy")
     for i,j in zip(trainingPrecisions, testingPrecisions):
