@@ -8,6 +8,8 @@ import numpy as np
 import os
 import joblib as jl
 
+# Pour save les classifieurs j'utilise joblib maintenant vu qu'on peut compresser les fichiers sinon j'avais des RF de 6Go
+
 cwd = os.getcwd()
 startTotal = time()
 rand = randint(0,10000)*randint(0,10000)
