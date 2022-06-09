@@ -6,7 +6,9 @@ from random import shuffle, randint
 from time import time
 import numpy as np
 import os
-import pickle
+import joblib as jl
+
+# Pour save les classifieurs j'utilise joblib maintenant vu qu'on peut compresser les fichiers sinon j'avais des RF de 6Go
 
 cwd = os.getcwd()
 startTotal = time()
@@ -76,6 +78,7 @@ list_files = [i.name for i in obj]
 print("4 Folds to be done : ")
 testingPrecisions = []
 trainingPrecisions = []
+
 for i in range(4):
     startFold = time()
     print("\n---------------------------------------------------------------------------------------------------------\n")
@@ -83,7 +86,7 @@ for i in range(4):
     # GETTING FILES FOR TRAINING SET AND TEST SET
 
     print(f"Starting Fold number {i+1} : ")
-    forest = RandomForestClassifier(n_estimators=400, n_jobs=2)
+    forest = RandomForestClassifier(n_estimators=300, n_jobs=2)
     testFiles = list_files[i*5:i*5+5]
     trainFiles = [trainFile for trainFile in list_files if trainFile not in testFiles]
 
@@ -135,7 +138,8 @@ for i in range(4):
     for x in range(width):
         for y in range(height):
             plt.annotate(str(confusionMX[x][y]),xy=(y,x),horizontalalignment='center',verticalalignment='center')
-    plt.savefig(cwd+"\\Matrix\\"+f"MatrixCV{rand}_Fold"+str(i+1)+".png" if "\\" in cwd else cwd+"/Matrix/"+f"MatrixCV{rand}_Fold"+str(i+1)+".png", bbox_inches='tight', dpi=300)
+    plt.savefig(cwd+"\\Results\\Matrix\\"+f"MatrixCV{rand}_Fold"+str(i+1)+".png" 
+                if "\\" in cwd else cwd+"/Results/Matrix/"+f"MatrixCV{rand}_Fold"+str(i+1)+".png", bbox_inches='tight', dpi=300)
         
     # KEEP BEST RF OUT OF THE 4       (Plus d'actualité vu qu'on garde pas le meilleur)
 
@@ -145,15 +149,21 @@ for i in range(4):
         bestRF = [forest, testPrecision]
         print("\nNEW BEST FOREST")"""
     
-    # SAVING FORESTS FOR NEXT STEP
-    
-    print("Saving the best RF in the folder \"cvClassifiers\"")
-    filename = cwd+f"\\cvClassifiers\\rfFold{i+1}.pkl" if "\\" in cwd else cwd+f"/cvClassifiers/rfFold{i+1}.pkl"
-    with open(filename, 'wb') as file:  
-        pickle.dump(forest, file)
+    # SAVING FORESTS FOR NEXT STEP      (Je save les 4 et dans le code finalRF3D.py je donne le droit de choisir quel fichier prendre)
 
-print("\nTraining Precision, Testing Accuracy")
-for i,j in zip(trainingPrecisions, testingPrecisions):
-    print("           ",i,", ",j)
+    print("Saving the best RF in the folder \"cvClassifiers\"")
+    filename = cwd+f"\\cvClassifiers\\rfFold{i+1}.joblib" if "\\" in cwd else cwd+f"/cvClassifiers/rfFold{i+1}.joblib"
+    jl.dump(bestRF[0], filename, compress=3)
+
+filename = cwd+f"\\Results\\precisionsCV{rand}.txt" if "\\" in cwd else cwd+f"/Results/precisionsCV{rand}.txt"
+
+with open('docs/readme.txt', 'w') as f:
+    f.write("Training Precision, Testing Accuracy")
+    print("\nTraining Precision, Testing Accuracy")
+    for i,j in zip(trainingPrecisions, testingPrecisions):
+        print("           ",i,", ",j)
+        f.write("           ",i,", ",j)
+    print("           ",sum(trainingPrecisions)/4,", ",sum(testingPrecisions)/4)
+    f.write("           ",sum(trainingPrecisions)/4,", ",sum(testingPrecisions)/4)
 end = int(time() - startTotal)
 print(f"\nDone in {end//60}m{end%60}s")
