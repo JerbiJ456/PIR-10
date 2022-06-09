@@ -8,8 +8,6 @@ import numpy as np
 import os
 import joblib as jl
 
-# Pour save les classifieurs j'utilise joblib maintenant vu qu'on peut compresser les fichiers sinon j'avais des RF de 6Go
-
 cwd = os.getcwd()
 startTotal = time()
 rand = randint(0,10000)*randint(0,10000)
@@ -153,7 +151,7 @@ for i in range(4):
 
     print("Saving the best RF in the folder \"cvClassifiers\"")
     filename = cwd+f"\\cvClassifiers\\rfFold{i+1}.joblib" if "\\" in cwd else cwd+f"/cvClassifiers/rfFold{i+1}.joblib"
-    jl.dump(bestRF[0], filename, compress=3)
+    jl.dump(forest, filename, compress=3)
 
 filename = cwd+f"\\Results\\precisionsCV{rand}.txt" if "\\" in cwd else cwd+f"/Results/precisionsCV{rand}.txt"
 
