@@ -61,15 +61,10 @@ for i in list_files:
         for y in images:
             for z in range(epi_img_data.shape[2]):
                 y[z] = translate(y[z])
-        image = Image.fromarray(np.asarray(images, dtype='uint8'))
-        filename = f"test{270}.png"
-        #image = image.transpose(Image.ROTATE_90)
-        image.save(cwd+'\\Imagettes3D\\'+filename if '\\' in cwd else cwd+'/Imagettes3D/'+filename)
-        print(f"level {x} done", end='\r')
     obj = os.scandir(cwd+'\\centers\\' if '\\' in cwd else cwd+'/centers/')
     list_center_files = [a.name for a in obj if i.split('.')[0] in a.name]
 
-    input_image = Image.open(cwd+"\\Imagettes3D\\test270.png")
+    input_image = Image.fromarray(np.asarray(images, dtype='uint8'))
     input_image = input_image.convert('RGB')
     draw = ImageDraw.Draw(input_image)
     colors = [  
