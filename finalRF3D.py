@@ -9,10 +9,6 @@ import csv
 from math import dist
 from PIL import Image, ImageDraw
 
-# DEPUIS LE DERNIER COMMIT J'AI AJOUTE UN DOSSIER 'RESULTS' QUI VA CONTENIR LES IMAGES AVEC LES x PLACES LA OU ON EST CENSE AVOIR LES CENTRES
-# DES ORGANES SI LE CODE PRENDS BEAUCOUP DE TEMPS VOUS POUVEZ CHANGER LE PAS POUR SAUTER QUELQUES IMAGES DANS LA BOUCLE FOR DE LA LIGNE 99
-# POUR L'INSTANT Y'A UN PAS DE 2 MAIS VOUS POUVEZ LE PASSER A 3 OU SINON VOUS POUVEZ CHANGER LE PAS DES 2 AUTRES FOR A LA PLACE
-
 def translate(value):
     leftMax = 2976
     leftMin = -1024
@@ -96,7 +92,7 @@ epi_img = nib.load(cwd+'\\Patients3D\\'+fread if '\\' in cwd else cwd+'/Patients
 epi_img_data = epi_img.get_fdata()
 tot_img = 0
 
-for z in range(0,epi_img_data.shape[2],2):
+for z in range(0,epi_img_data.shape[2]):
     for x in range(0,epi_img_data.shape[0]//33):
         for y in range(0,epi_img_data.shape[1]//33):
             imagette = np.array([])
@@ -115,14 +111,14 @@ for z in range(0,epi_img_data.shape[2],2):
                 coor[a][0] += (x*33+(33/2))*Pox if a not in predicted else (x*33+(33/2))
                 coor[a][1] += (y*33+(33/2))*Pox if a not in predicted else (y*33+(33/2))
                 coor[a][2] += z*Pox if a not in predicted else z
-                coor[a][3] += 1*Pox if a not in predicted else 1
-    print(f"z = {z//2} done, {epi_img_data.shape[2]//2-z//2} left", end='\r')
+                coor[a][3] += 1 if Pox else 0
+    print(f"z = {z} done, {epi_img_data.shape[2]-z-1} left", end='\r')
 
 tot = 0
 print("\n\nProbabilities : \n".upper())
 for i in prob:
     print(f"Pr({i}|imagette) = {round(prob[i]*100/tot_img,2)} %")
-    tot += prob[i]/(tot_img*15*15)
+    tot += prob[i]/(tot_img)
 print(f"Ptot(organe|imagette) = {round(tot*100,2)} %")
 
 print("\nCenter Coordinates : \n".upper())
@@ -142,10 +138,13 @@ for i in coor:
     coor[i][2] = z
     print(f"{i} : ({x},{y},{z}), Real Center : {(organCoor[0],organCoor[1],organCoor[2])}, d = {round(dist((x,y,z),(organCoor[0],organCoor[1],organCoor[2])),2)}")
 
+
+print("\n\n")
+
 end = int(time() - start)
 print(f"\nDone in {end//60}m{end%60}s")
 
-image = np.array(epi_img_data[:, 270, :])
+image = np.array(epi_img_data[:, 280, :])
 for x in image:
     for z in range(epi_img_data.shape[2]):
         x[z] = translate(x[z])
@@ -153,9 +152,7 @@ image = Image.fromarray(np.asarray(image, dtype='uint8'))
 filename = f"CentersResultFold{foldChoisi+1}.png"
 image.save(cwd+'\\Results\\'+filename if '\\' in cwd else cwd+'/Results/'+filename)
 input_image = Image.open(cwd+'\\Results\\'+filename if '\\' in cwd else cwd+'/Results/'+filename)
-rgb_im = input_image.convert('RGB')
-rgb_im.save(cwd+'\\Results\\'+filename if '\\' in cwd else cwd+'/Results/'+filename)
-input_image = Image.open(cwd+'\\Results\\'+filename if '\\' in cwd else cwd+'/Results/'+filename)
+input_image = input_image.convert('RGB')
 draw = ImageDraw.Draw(input_image)
 colors = [  
             "red", "green", "blue", "yellow",
@@ -168,9 +165,9 @@ colors = [
 a = input_image.size
 print(a)
 for i,color in zip(coor,colors):
-    draw.line([(int(coor[i][0]-6),int(coor[i][2]-6)),(int(coor[i][0]+6),int(coor[i][2]+6))], width=5, 
+    draw.line([(coor[i][2]-6,coor[i][0]-6),(coor[i][2]+6,coor[i][0]+6)], width=5, 
                 fill=color)
-    draw.line([(int(coor[i][0]-6),int(coor[i][2]+6)),(int(coor[i][0]+6),int(coor[i][2]-6))], width=5, 
+    draw.line([(coor[i][2]+6,coor[i][0]-6),(coor[i][2]-6,coor[i][0]+6)], width=5, 
                 fill=color)
 input_image = input_image.transpose(Image.ROTATE_90)
 input_image.save(cwd+'\\Results\\'+filename if '\\' in cwd else cwd+'/Results/'+filename)
