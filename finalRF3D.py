@@ -108,10 +108,10 @@ for z in range(0,epi_img_data.shape[2]):
                 prob[a] += prob_predicted[0][b]
             for a in lo:
                 Pox = prob_predicted[0][lo.index(a)]
-                coor[a][0] += (x*33+(33/2))*Pox if a not in predicted else (x*33+(33/2))
-                coor[a][1] += (y*33+(33/2))*Pox if a not in predicted else (y*33+(33/2))
-                coor[a][2] += z*Pox if a not in predicted else z
-                coor[a][3] += 1 if Pox else 0
+                coor[a][0] += (x*33+(33/2))*Pox
+                coor[a][1] += (y*33+(33/2))*Pox
+                coor[a][2] += z*Pox
+                coor[a][3] += 1
     print(f"z = {z} done, {epi_img_data.shape[2]-z-1} left", end='\r')
 
 tot = 0
@@ -130,11 +130,11 @@ for i in coor:
             csvreader = csv.reader(f)
             for z in csvreader:
                 organCoor = list(map(float,z))
-    x = round(coor[i][0]/(coor[i][3]),1)
+    x = round(coor[i][0]/coor[i][3],1)
     coor[i][0] = x
-    y = round(coor[i][1]/(coor[i][3]),1)
+    y = round(coor[i][1]/coor[i][3],1)
     coor[i][1] = y
-    z = round(coor[i][2]/(coor[i][3]),1)
+    z = round(coor[i][2]/coor[i][3],1)
     coor[i][2] = z
     print(f"{i} : ({x},{y},{z}), Real Center : {(organCoor[0],organCoor[1],organCoor[2])}, d = {round(dist((x,y,z),(organCoor[0],organCoor[1],organCoor[2])),2)}")
 
